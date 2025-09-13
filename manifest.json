@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Amazon Seller Info",
+  "version": "1.5",
+  "description": "Extracts Amazon product info and saves rows to CSV using storage.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.amazon.com/*", "*://www.amazon.co.uk/*", "*://www.amazon.ca/*", "*://www.amazon.de/*", "*://www.amazon.in/*", "*://www.amazon.co.jp/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

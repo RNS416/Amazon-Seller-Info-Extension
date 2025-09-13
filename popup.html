@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Amazon Seller Info</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      min-width: 400px; 
+      padding: 10px; 
+      font-size: 13px;
+    }
+    h1 { 
+      font-size: 16px; 
+      margin-bottom: 10px; 
+      text-align: center;
+      color: #333;
+    }
+    .info-container {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .info-label {
+      font-weight: bold;
+      color: #555;
+    }
+    .info-value {
+      color: #333;
+    }
+    .red { color: #ff4444; font-weight: bold; }
+    .green { color: #00aa00; font-weight: bold; }
+    
+    .filters-toggle {
+      background: #f0f0f0;
+      border: none;
+      padding: 6px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      margin: 8px 0;
+      border-radius: 4px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .filter-section {
+      display: none;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+      margin-top: 5px;
+    }
+    
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 70px 1fr 70px 1fr;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+    
+    .filter-label {
+      font-size: 12px;
+      color: #666;
+      align-self: center;
+    }
+    
+    .filter-input {
+      width: 100%;
+      padding: 3px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+    }
+    
+    .status-bar {
+      margin: 10px 0;
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+    
+    .status-green {
+      background-color: #e6ffe6;
+      color: #00aa00;
+      border: 1px solid #00aa00;
+    }
+    
+    .status-red {
+      background-color: #ffe6e6;
+      color: #ff4444;
+      border: 1px solid #ff4444;
+    }
+    
+    .status-neutral {
+      background-color: #f0f0f0;
+      color: #666;
+      border: 1px solid #ddd;
+    }
+    
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    button {
+      padding: 6px;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #f8f8f8;
+      font-size: 12px;
+    }
+    
+    button:hover {
+      background: #e8e8e8;
+    }
+    
+    .compact-view {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .arrow {
+      display: inline-block;
+      width: 0;
+      height: 0;
+      margin-left: 5px;
+    }
+    
+    .arrow-down {
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #666;
+    }
+    
+    .arrow-up {
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Amazon Seller Info</h1>
+  
+  <div class="compact-view">
+    <div class="info-container">
+      <span class="info-label">Brand:</span>
+      <span class="info-value" id="brand">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">Ships from:</span>
+      <span class="info-value" id="shipsFrom">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">Sold by:</span>
+      <span class="info-value" id="soldBy">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">Sellers:</span>
+      <span class="info-value" id="totalSellers">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">ASIN:</span>
+      <span class="info-value" id="asin">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">BSR Rank:</span>
+      <span class="info-value" id="bsrRank">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">Price:</span>
+      <span class="info-value" id="price">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">Bought (30d):</span>
+      <span class="info-value" id="boughtInPastMonth">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">Rating:</span>
+      <span class="info-value" id="rating">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">Reviews:</span>
+      <span class="info-value" id="reviewCount">Loading...</span>
+    </div>
+    <div class="info-container">
+      <span class="info-label">Note:</span>
+      <span class="info-value" id="note"></span>
+    </div>
+  </div>
+
+  <button class="filters-toggle" id="filtersToggle">
+    <span>Show Filters</span>
+    <span class="arrow arrow-down" id="filterArrow"></span>
+  </button>
+  
+  <div class="filter-section" id="filterSection">
+    <div class="filter-grid">
+      <span class="filter-label">BSR Min:</span>
+      <input type="number" id="bsrMin" class="filter-input" placeholder="Min">
+      <span class="filter-label">BSR Max:</span>
+      <input type="number" id="bsrMax" class="filter-input" placeholder="Max">
+    </div>
+    <div class="filter-grid">
+      <span class="filter-label">Reviews Min:</span>
+      <input type="number" id="reviewsMin" class="filter-input" placeholder="Min">
+      <span class="filter-label">Reviews Max:</span>
+      <input type="number" id="reviewsMax" class="filter-input" placeholder="Max">
+    </div>
+    <div class="filter-grid">
+      <span class="filter-label">Sellers Min:</span>
+      <input type="number" id="sellersMin" class="filter-input" placeholder="Min">
+      <span class="filter-label">Sellers Max:</span>
+      <input type="number" id="sellersMax" class="filter-input" placeholder="Max">
+    </div>
+    <div class="filter-grid">
+      <span class="filter-label">Rating Min:</span>
+      <input type="number" id="ratingMin" class="filter-input" placeholder="Min" step="0.1" min="0" max="5">
+      <span class="filter-label">Rating Max:</span>
+      <input type="number" id="ratingMax" class="filter-input" placeholder="Max" step="0.1" min="0" max="5">
+    </div>
+    <div class="filter-grid">
+      <span class="filter-label">Bought Min:</span>
+      <input type="number" id="boughtMin" class="filter-input" placeholder="Min">
+      <span class="filter-label">Bought Max:</span>
+      <input type="number" id="boughtMax" class="filter-input" placeholder="Max">
+    </div>
+    <div class="filter-grid">
+      <span class="filter-label">Price Min:</span>
+      <input type="number" id="priceMin" class="filter-input" placeholder="Min" step="0.01">
+      <span class="filter-label">Price Max:</span>
+      <input type="number" id="priceMax" class="filter-input" placeholder="Max" step="0.01">
+    </div>
+    <button id="applyFilters">Apply Filters</button>
+  </div>
+
+  <div class="status-bar status-neutral" id="status">Status: Not Checked</div>
+
+  <div class="button-row">
+    <button id="addRow">Add Row</button>
+    <button id="exportCsv">Export CSV</button>
+  </div>
+</body>
+<script src="popup.js"></script>
+</html>
