@@ -81,41 +81,49 @@ function extractAmazonData() {
         if (newMatch && newMatch[1]) {
             totalSellers = newMatch[1];
         }
-        // Method 3: Look for "X new from $Y.ZZ" pattern
+        // NEW METHOD: Look for "New & Used (X)" pattern
         else {
-            const newFromMatch = document.body.textContent.match(/(\d+)\s+new\s+from/i);
-            if (newFromMatch && newFromMatch[1]) {
-                totalSellers = newFromMatch[1];
+            const newUsedMatch = document.body.textContent.match(/New\s+&\s+Used\s+\((\d+)\)/i);
+            if (newUsedMatch && newUsedMatch[1]) {
+                totalSellers = newUsedMatch[1];
             }
-            // Method 4: Look for seller count in offer listing links
+            // Method 3: Look for "X new from $Y.ZZ" pattern
             else {
-                const sellerLinks = document.querySelectorAll('a');
-                for (const link of sellerLinks) {
-                    if (link.href && link.href.includes('offer-listing')) {
-                        // Look for patterns like "17 new from $19.98" or "41 offers"
-                        const match = link.textContent.match(/(\d+)\s+(?:new|used|offers|options)/i);
-                        if (match) {
-                            totalSellers = match[1];
-                            break;
+                const newFromMatch = document.body.textContent.match(/(\d+)\s+new\s+from/i);
+                if (newFromMatch && newFromMatch[1]) {
+                    totalSellers = newFromMatch[1];
+                }
+                // Method 4: Look for seller count in offer listing links
+                else {
+                    const sellerLinks = document.querySelectorAll('a');
+                    for (const link of sellerLinks) {
+                        if (link.href && link.href.includes('offer-listing')) {
+                            // Look for patterns like "17 new from $19.98" or "41 offers"
+                            const match = link.textContent.match(/(\d+)\s+(?:new|used|offers|options)/i);
+                            if (match) {
+                                totalSellers = match[1];
+                                break;
+                            }
                         }
                     }
-                }
-                // Method 5: Search the entire page text as last resort
-                if (totalSellers === "Not found") {
-                    const pageText = document.body.textContent;
-                    const patterns = [
-                        /(\d+)\s+options\s+from/i,
-                        /New\s+\((\d+)\)\s+from/i,
-                        /(\d+)\s+new\s+from/i,
-                        /(\d+)\s+used\s+from/i,
-                        /See all\s+(\d+)\s+offers/i
-                    ];
-                    
-                    for (const pattern of patterns) {
-                        const match = pageText.match(pattern);
-                        if (match && match[1]) {
-                            totalSellers = match[1];
-                            break;
+                    // Method 5: Search the entire page text as last resort
+                    if (totalSellers === "Not found") {
+                        const pageText = document.body.textContent;
+                        const patterns = [
+                            /(\d+)\s+options\s+from/i,
+                            /New\s+\((\d+)\)\s+from/i,
+                            /New\s+&\s+Used\s+\((\d+)\)/i, // Added this pattern
+                            /(\d+)\s+new\s+from/i,
+                            /(\d+)\s+used\s+from/i,
+                            /See all\s+(\d+)\s+offers/i
+                        ];
+                        
+                        for (const pattern of patterns) {
+                            const match = pageText.match(pattern);
+                            if (match && match[1]) {
+                                totalSellers = match[1];
+                                break;
+                            }
                         }
                     }
                 }
